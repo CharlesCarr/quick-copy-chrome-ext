@@ -4,7 +4,7 @@ import {
   signInWithPassword,
   signUp,
 } from "../utils/supabase-utils";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -12,7 +12,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-//   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +24,7 @@ const Auth = () => {
         if (error) throw new Error(error);
         console.log(data);
         console.log("User ID", data.user.id);
-        // navigate("/");
+        navigate("/");
       } catch (err) {
         console.error(err);
       }
@@ -35,7 +35,7 @@ const Auth = () => {
           const { data, error } = await signUp(email, password);
           if (error) throw new Error(error);
           console.log(data);
-        //   navigate("/");
+          setIsLogin(true);
         } catch (err) {
           console.error(err);
         }

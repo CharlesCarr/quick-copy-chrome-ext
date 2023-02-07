@@ -5,6 +5,8 @@ import Auth from "./pages/auth";
 import { supabase } from "./config/supabase-client";
 import { useEffect, useState } from "react";
 import Profile from "./pages/profile";
+import ProtectedRoute from "./pages/helpers/protected-route";
+import Snippets from "./pages/snippets";
 
 function App() {
   const [session, setSession] = useState(null);
@@ -24,14 +26,14 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route element={<ProtectedRoute session={session} />}>
+          <Route path="/" element={<Home session={session} />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/snippets" element={<Snippets />} />
+        </Route>
       </Routes>
     </Router>
-    // <div style={{ padding: '50px 0 100px 0' }}>
-    //   {!session ? <Auth /> : <Home key={session.user.id} session={session} />}
-    // </div>
   );
 }
 
