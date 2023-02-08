@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "../config/supabase-client";
 
-const CreateFirstSnip = ({ session }) => {
+const CreateFirstSnip = ({ session, setUserSnips }) => {
   const [name, setName] = useState();
   const [text, setText] = useState();
   const [category, setCategory] = useState();
@@ -25,6 +25,7 @@ const CreateFirstSnip = ({ session }) => {
     // TODO: Clear Form
 
     // TODO: Change state for Snippets component (now have length > 0)
+    setUserSnips(data);
 
       if (error) throw new Error(error);
       console.log(data);

@@ -6,6 +6,7 @@ import { supabase } from "../config/supabase-client";
 const Snippets = ({ session }) => {
   const [loading, setLoading] = useState(true);
   const [userSnips, setUserSnips] = useState(true);
+  console.log(userSnips);
 
   // Need function for getting snips for the user
   useEffect(() => {
@@ -56,7 +57,7 @@ const Snippets = ({ session }) => {
             return <Snip key={d.id} data={d} />;
           })
         ) : (
-          <CreateFirstSnip session={session} />
+          <CreateFirstSnip session={session} setUserSnips={setUserSnips} />
         )}
       </div>
     </div>
