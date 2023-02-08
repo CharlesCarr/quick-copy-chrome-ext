@@ -29,8 +29,8 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route element={<ProtectedRoute session={session} />}>
           <Route path="/" element={<Home session={session} />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/snippets" element={<Snippets />} />
+          <Route path="/profile" element={<Profile session={session} />} />
+          <Route path="/snippets" element={<Snippets session={session} />} />
         </Route>
       </Routes>
     </Router>
