@@ -13,6 +13,7 @@ function App() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
+      // TODO: think need to add check here and navigate (?)
       setSession(session);
     });
 

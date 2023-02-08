@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import CreateFirstSnip from "../components/create-first-snip";
 import Snip from "../components/snip";
 import { supabase } from "../config/supabase-client";
 
@@ -50,10 +51,13 @@ const Snippets = ({ session }) => {
           justifyContent: "center",
         }}
       >
-        {userSnips &&
+        {userSnips.length > 0 ? (
           userSnips.map((d) => {
             return <Snip key={d.id} data={d} />;
-          })}
+          })
+        ) : (
+          <CreateFirstSnip session={session} />
+        )}
       </div>
     </div>
   );
