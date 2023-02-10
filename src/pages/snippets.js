@@ -49,6 +49,19 @@ const Snippets = ({ session }) => {
     }
   };
 
+  const copyText = async (text) => {
+    console.log(text);
+    try {
+      await navigator.clipboard.writeText(text);
+      // Alert the copied text
+      alert(`Copied Text! - ${text}`);
+      // displayToast(text);
+    } catch (err) {
+      console.error(`Failed to Copy - ${err}`);
+      alert(`Failed to Copy - ${err}`);
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -89,7 +102,12 @@ const Snippets = ({ session }) => {
                     </TableCell>
                     <TableCell align="right">{row.snip_text}</TableCell>
                     <TableCell align="right">{row.category}</TableCell>
-                    <TableCell align="right">Copy</TableCell>
+                    <TableCell
+                      align="right"
+                      onClick={() => copyText(row.snip_text)}
+                    >
+                      Copy
+                    </TableCell>
                     <TableCell align="right">Edit</TableCell>
                   </TableRow>
                 ))}
