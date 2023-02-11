@@ -12,12 +12,15 @@ import {
   TableRow,
   TableFooter,
   Paper,
+  Input,
 } from "@mui/material";
 
 const Snippets = ({ session }) => {
   const [loading, setLoading] = useState(true);
   const [userSnips, setUserSnips] = useState(true);
   console.log(userSnips);
+
+  const { user } = session;
 
   // Need function for getting snips for the user
   useEffect(() => {
@@ -40,7 +43,14 @@ const Snippets = ({ session }) => {
 
       if (data) {
         console.log("DATA RETURNED", data);
-        setUserSnips(data);
+        const tableData = data.map((d) => {
+          return {
+            ...d,
+            edit: false,
+          };
+        });
+        console.log("tableData", tableData);
+        setUserSnips(tableData);
       }
     } catch (err) {
       console.error(err);
@@ -60,6 +70,22 @@ const Snippets = ({ session }) => {
       console.error(`Failed to Copy - ${err}`);
       alert(`Failed to Copy - ${err}`);
     }
+  };
+
+  const addRowHandler = () => {
+    console.log("add row clicked");
+
+    setUserSnips([
+      ...userSnips,
+      {
+        category: "new",
+        id: 7,
+        name: "new-test",
+        snip_text: "new-test-text",
+        user_id: user.id,
+        edit: true,
+      },
+    ]);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -94,27 +120,34 @@ const Snippets = ({ session }) => {
               <TableBody>
                 {userSnips.map((row) => (
                   <TableRow
+                    hover
                     key={row.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      {row.name}
+                      {row.edit ? <Input></Input> : row.name}
                     </TableCell>
-                    <TableCell align="right">{row.snip_text}</TableCell>
-                    <TableCell align="right">{row.category}</TableCell>
+                    <TableCell align="right">
+                      {row.edit ? <Input></Input> : row.snip_text}
+                    </TableCell>
+                    <TableCell align="right">
+                      {row.edit ? <Input></Input> : row.category}
+                    </TableCell>
                     <TableCell
                       align="right"
                       onClick={() => copyText(row.snip_text)}
                     >
                       Copy
                     </TableCell>
-                    <TableCell align="right">Edit</TableCell>
+                    <TableCell align="right">
+                      {row.edit ? "Edit" : "Save"}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
               <TableFooter>
-                <TableRow>
-                  <TableCell>Add New Row</TableCell>
+                <TableRow hover>
+                  <TableCell onClick={addRowHandler}>Add New Row</TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
