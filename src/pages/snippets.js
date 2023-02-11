@@ -145,12 +145,18 @@ const Snippets = ({ session }) => {
                   </TableRow>
                 ))}
               </TableBody>
-              <TableFooter>
-                <TableRow hover>
-                  <TableCell onClick={addRowHandler}>Add New Row</TableCell>
-                </TableRow>
-              </TableFooter>
             </Table>
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: 5
+              }}
+            >
+              <button onClick={addRowHandler}>Add New Row</button>
+            </div>
           </TableContainer>
         ) : (
           <CreateFirstSnip session={session} setUserSnips={setUserSnips} />
