@@ -18,7 +18,10 @@ import {
 const Snippets = ({ session }) => {
   const [loading, setLoading] = useState(true);
   const [userSnips, setUserSnips] = useState(true);
-  console.log(userSnips);
+  console.log('userSnips', userSnips);
+
+  const [updatedSnip, setUpdatedSnip] = useState(null);
+  console.log('updatedSnip', updatedSnip);
 
   const { user } = session;
 
@@ -78,14 +81,63 @@ const Snippets = ({ session }) => {
     setUserSnips([
       ...userSnips,
       {
-        category: "new",
-        id: 7,
-        name: "new-test",
-        snip_text: "new-test-text",
+        category: "",
+        id: 1234,
+        name: "",
+        snip_text: "",
         user_id: user.id,
         edit: true,
       },
     ]);
+  };
+
+  const editSaveHandler = async (row) => {
+    console.log("row", row);
+    console.log(row.edit);
+
+    if (row.edit) {
+      // 'Save' is showing
+
+      console.log('row.name', row.name);
+
+      // conditional for whether saving for first time or updating
+      // TODO 1: save for first time
+      const { data, error } = await supabase
+        .from("snips")
+        .insert({
+          user_id: user.id,
+          name: updatedSnip.name,
+          snip_text: updatedSnip.snip_text,
+          category: updatedSnip.category,
+        })
+        .select();
+
+      console.log('data', data);
+      console.log('error', error);
+
+      // refetching from Supabase
+      getSnips();
+
+      // Now have this saving correctly to Supabase
+      // Need to flip the edit state after it has been saved 
+
+      // TODO 2: update existing record
+
+      // will need to send update or addition to Supabase
+      console.log("saving");
+    } else {
+      console.log('editting!!');
+      // flip the state to edit being true
+      console.log(userSnips);
+
+      const newSnipArr = userSnips.map((snip) => {
+        if (snip.id === row.id) {
+          snip.edit = true;
+        }
+        return snip;
+      });
+      setUserSnips(newSnipArr);
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -103,9 +155,6 @@ const Snippets = ({ session }) => {
         }}
       >
         {userSnips.length > 0 ? (
-          // userSnips.map((d) => {
-          //   return <Snip key={d.id} data={d} />;
-          // })
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 450 }} aria-label="simple table">
               <TableHead>
@@ -125,13 +174,49 @@ const Snippets = ({ session }) => {
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      {row.edit ? <Input></Input> : row.name}
+                      {row.edit ? (
+                        <Input
+                          placeholder={row.name}
+                          onChange={(e) =>
+                            setUpdatedSnip({
+                              ...updatedSnip,
+                              name: e.target.value,
+                            })
+                          }
+                        ></Input>
+                      ) : (
+                        row.name
+                      )}
                     </TableCell>
                     <TableCell align="right">
-                      {row.edit ? <Input></Input> : row.snip_text}
+                      {row.edit ? (
+                        <Input
+                          placeholder={row.snip_text}
+                          onChange={(e) =>
+                            setUpdatedSnip({
+                              ...updatedSnip,
+                              snip_text: e.target.value,
+                            })
+                          }
+                        ></Input>
+                      ) : (
+                        row.snip_text
+                      )}
                     </TableCell>
                     <TableCell align="right">
-                      {row.edit ? <Input></Input> : row.category}
+                      {row.edit ? (
+                        <Input
+                          placeholder={row.category}
+                          onChange={(e) =>
+                            setUpdatedSnip({
+                              ...updatedSnip,
+                              category: e.target.value,
+                            })
+                          }
+                        ></Input>
+                      ) : (
+                        row.category
+                      )}
                     </TableCell>
                     <TableCell
                       align="right"
@@ -139,8 +224,11 @@ const Snippets = ({ session }) => {
                     >
                       Copy
                     </TableCell>
-                    <TableCell align="right">
-                      {row.edit ? "Edit" : "Save"}
+                    <TableCell
+                      align="right"
+                      onClick={() => editSaveHandler(row)}
+                    >
+                      {row.edit ? "Save" : "Edit"}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -152,7 +240,7 @@ const Snippets = ({ session }) => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                padding: 5
+                padding: 5,
               }}
             >
               <button onClick={addRowHandler}>Add New Row</button>
