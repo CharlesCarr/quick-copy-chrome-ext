@@ -16,6 +16,8 @@ import {
   Autocomplete,
   TextField,
 } from "@mui/material";
+import Header from "../components/header";
+import TableHeader from "../components/table-header";
 
 const Snippets = ({ session }) => {
   const [loading, setLoading] = useState(true);
@@ -200,152 +202,160 @@ const Snippets = ({ session }) => {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
-      <h1>Snippets</h1>
+    <div style={{ width: "100vw", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div style={{ width: "40%", border: "1px solid black", padding: "10px" }}>
+        <Header />
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {userSnips.length > 0 ? (
-          <>
-            <Autocomplete
-              freeSolo
-              id="free-solo-2-demo"
-              disableClearable
-              style={{ width: "80%" }}
-              options={userSnips.map((row) => row.name)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Search input"
-                  InputProps={{
-                    ...params.InputProps,
-                    type: "search",
-                  }}
-                  onChange={(e) => searchRows(e.target.value)}
-                />
-              )}
-            />
+        <div style={{ display: 'flex', alignItems: "center", justifyContent: "space-between"}}>
+          <h1>Snippets</h1>
 
-            <div style={{ display: "flex", width: "100%" }}>
-              <button onClick={() => setDisplayedSnips(userSnips)}>All</button>
-              {categories.map((category) => (
-                <button
-                  onClick={(e) => categoryClickHandler(e.target.innerHTML)}
-                >
-                  {category}
+          <Autocomplete
+                freeSolo
+                id="free-solo-2-demo"
+                disableClearable
+                style={{ width: "200px" }}
+                options={userSnips.map((row) => row.name)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Search input"
+                    InputProps={{
+                      ...params.InputProps,
+                      type: "search",
+                    }}
+                    onChange={(e) => searchRows(e.target.value)}
+                  />
+                )}
+              />
+
+        </div>
+        
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {userSnips.length > 0 ? (
+            <>
+              
+              <div style={{ display: "flex", width: "100%" }}>
+                <button onClick={() => setDisplayedSnips(userSnips)}>
+                  All
                 </button>
-              ))}
-            </div>
+                {categories.map((category) => (
+                  <button
+                    onClick={(e) => categoryClickHandler(e.target.innerHTML)}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
 
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 450 }} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell align="right">Copy Text</TableCell>
-                    <TableCell align="right">Category</TableCell>
-                    <TableCell align="right">Copy Btn</TableCell>
-                    <TableCell align="right">Edit Btn</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {displayedSnips.map((row) => (
-                    <TableRow
-                      hover
-                      key={row.id}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        {row.edit ? (
-                          <Input
-                            placeholder={row.name}
-                            onChange={(e) =>
-                              setUpdatedSnip({
-                                ...updatedSnip,
-                                name: e.target.value,
-                              })
-                            }
-                          ></Input>
-                        ) : (
-                          row.name
-                        )}
-                      </TableCell>
-                      <TableCell align="right">
-                        {row.edit ? (
-                          <Input
-                            placeholder={row.snip_text}
-                            onChange={(e) =>
-                              setUpdatedSnip({
-                                ...updatedSnip,
-                                snip_text: e.target.value,
-                              })
-                            }
-                          ></Input>
-                        ) : (
-                          row.snip_text
-                        )}
-                      </TableCell>
-                      <TableCell align="right">
-                        {row.edit ? (
-                          <Input
-                            placeholder={row.category}
-                            onChange={(e) =>
-                              setUpdatedSnip({
-                                ...updatedSnip,
-                                category: e.target.value,
-                              })
-                            }
-                          ></Input>
-                        ) : (
-                          row.category
-                        )}
-                      </TableCell>
-
-                      {row.edit ? (
-                        <TableCell align="right" onClick={() => deleteRow(row)}>
-                          Delete
+              <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 450 }} aria-label="simple table">
+                  <TableHeader />
+                  <TableBody>
+                    {displayedSnips.map((row) => (
+                      <TableRow
+                        hover
+                        key={row.id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          {row.edit ? (
+                            <Input
+                              placeholder={row.name}
+                              onChange={(e) =>
+                                setUpdatedSnip({
+                                  ...updatedSnip,
+                                  name: e.target.value,
+                                })
+                              }
+                            ></Input>
+                          ) : (
+                            row.name
+                          )}
                         </TableCell>
-                      ) : (
+                        <TableCell align="right">
+                          {row.edit ? (
+                            <Input
+                              placeholder={row.snip_text}
+                              onChange={(e) =>
+                                setUpdatedSnip({
+                                  ...updatedSnip,
+                                  snip_text: e.target.value,
+                                })
+                              }
+                            ></Input>
+                          ) : (
+                            row.snip_text
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {row.edit ? (
+                            <Input
+                              placeholder={row.category}
+                              onChange={(e) =>
+                                setUpdatedSnip({
+                                  ...updatedSnip,
+                                  category: e.target.value,
+                                })
+                              }
+                            ></Input>
+                          ) : (
+                            row.category
+                          )}
+                        </TableCell>
+
+                        {row.edit ? (
+                          <TableCell
+                            align="right"
+                            onClick={() => deleteRow(row)}
+                          >
+                            Delete
+                          </TableCell>
+                        ) : (
+                          <TableCell
+                            align="right"
+                            onClick={() => copyText(row.snip_text)}
+                          >
+                            Copy
+                          </TableCell>
+                        )}
+
                         <TableCell
                           align="right"
-                          onClick={() => copyText(row.snip_text)}
+                          onClick={() => editSaveHandler(row)}
                         >
-                          Copy
+                          {row.edit ? "Save" : "Edit"}
                         </TableCell>
-                      )}
-
-                      <TableCell
-                        align="right"
-                        onClick={() => editSaveHandler(row)}
-                      >
-                        {row.edit ? "Save" : "Edit"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding: 5,
-                }}
-              >
-                <button onClick={addRowHandler}>Add New Row</button>
-              </div>
-            </TableContainer>
-          </>
-        ) : (
-          <CreateFirstSnip session={session} setUserSnips={setUserSnips} />
-        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 5,
+                  }}
+                >
+                  <button onClick={addRowHandler}>Add New Row</button>
+                </div>
+              </TableContainer>
+            </>
+          ) : (
+            <CreateFirstSnip session={session} setUserSnips={setUserSnips} />
+          )}
+        </div>
       </div>
     </div>
   );

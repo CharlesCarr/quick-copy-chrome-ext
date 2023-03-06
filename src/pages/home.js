@@ -61,8 +61,14 @@ const Home = ({ session }) => {
 
       {/* <p>Session User Email{session.user.email}</p> */}
 
-      <p>{`Username ${username}`}</p>
-      <p>{`Avatar URL ${avatar_url}`}</p>
+      {/* <p>{`Username ${username}`}</p> */}
+      <p>{`Username: ${session.user.user_metadata.email}`}</p>
+
+      <img
+        src={session.user.user_metadata.avatar_url}
+        alt="avatar pic"
+        style={{ width: "60px", height: "60px" }}
+      />
 
       <button onClick={() => supabase.auth.signOut()}>Sign Out</button>
     </div>

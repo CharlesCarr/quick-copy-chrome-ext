@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import Profile from "./pages/profile";
 import ProtectedRoute from "./pages/helpers/protected-route";
 import Snippets from "./pages/snippets";
+import DefaultSnippets from "./pages/default-snippets";
 
 function App() {
   const [session, setSession] = useState(null);
@@ -25,14 +26,25 @@ function App() {
   console.log("Session", session);
 
   return (
+    // <Router>
+    //   <Routes>
+    //     <Route path="/auth" element={<Auth />} />
+    //     <Route element={<ProtectedRoute session={session} />}>
+    //       <Route path="/" element={<Home session={session} />} />
+    //       <Route path="/profile" element={<Profile session={session} />} />
+    //       <Route path="/snippets" element={<Snippets session={session} />} />
+    //     </Route>
+    //   </Routes>
+    // </Router>
+
+    // TO DO: RECONSTRUCT ROUTES FOR NEW SNIPPETS PAGE
+
     <Router>
       <Routes>
-        <Route path="/auth" element={<Auth />} />
-        <Route element={<ProtectedRoute session={session} />}>
-          <Route path="/" element={<Home session={session} />} />
-          <Route path="/profile" element={<Profile session={session} />} />
-          <Route path="/snippets" element={<Snippets session={session} />} />
-        </Route>
+        <Route path="/" element={<DefaultSnippets />} />
+        {/* <Route path="/auth" element={<Auth />} />
+        <Route path="/profile" element={<Profile session={session} />} />
+        <Route path="/snippets" element={<Snippets session={session} />} /> */}
       </Routes>
     </Router>
   );
