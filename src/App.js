@@ -41,10 +41,9 @@ function App() {
 
     <Router>
       <Routes>
-        <Route path="/" element={<DefaultSnippets />} />
-        {/* <Route path="/auth" element={<Auth />} />
+        <Route path="/" element={<DefaultSnippets session={session} />} />
+        <Route path="/snippets" element={<Snippets session={session} />} />
         <Route path="/profile" element={<Profile session={session} />} />
-        <Route path="/snippets" element={<Snippets session={session} />} /> */}
       </Routes>
     </Router>
   );

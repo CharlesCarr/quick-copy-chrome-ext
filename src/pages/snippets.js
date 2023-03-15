@@ -15,25 +15,42 @@ import {
   Input,
   Autocomplete,
   TextField,
+  Box,
+  Snackbar,
+  Button,
+  Divider,
+  IconButton,
+  Tab,
+  Tabs,
 } from "@mui/material";
 import Header from "../components/header";
 import TableHeader from "../components/table-header";
+import { useNavigate } from "react-router-dom";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MuiAlert from "@mui/material/Alert";
+import { TableRowsSharp } from "@mui/icons-material";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Snippets = ({ session }) => {
   const [loading, setLoading] = useState(true);
   const [userSnips, setUserSnips] = useState(true);
   console.log("userSnips", userSnips);
-
   const [updatedSnip, setUpdatedSnip] = useState(null);
   console.log("updatedSnip", updatedSnip);
-
   const [searching, setSearching] = useState(false);
   const [displayedSnips, setDisplayedSnips] = useState([]);
   console.log(displayedSnips);
-
   const [categories, setCategories] = useState([]);
-
+  const [showToast, setShowToast] = useState(false);
+  const [rowCopied, setRowCopied] = useState(null);
   const { user } = session;
+  const [tabVal, setTabVal] = useState(1);
 
   // Need function for getting snips for the user
   useEffect(() => {
@@ -87,8 +104,9 @@ const Snippets = ({ session }) => {
     try {
       await navigator.clipboard.writeText(text);
       // Alert the copied text
-      alert(`Copied Text! - ${text}`);
-      // displayToast(text);
+      // alert(`Copied Text! - ${text}`);
+      setRowCopied(text);
+      setShowToast(true);
     } catch (err) {
       console.error(`Failed to Copy - ${err}`);
       alert(`Failed to Copy - ${err}`);
@@ -199,40 +217,71 @@ const Snippets = ({ session }) => {
     setDisplayedSnips(filteredRows);
   };
 
+  const handleRowClick = (row) => {
+    if (!row.edit) {
+      copyText(row.snip_text);
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div style={{ width: "100vw", display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <div style={{ width: "40%", border: "1px solid black", padding: "10px" }}>
-        <Header />
+    <Box
+      sx={{
+        width: "100vw",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Box sx={{ width: "50%", border: "1px solid #b2b2b2", padding: "20px" }}>
+        <Snackbar
+          open={showToast}
+          autoHideDuration={3000}
+          onClose={() => setShowToast(false)}
+        >
+          <Alert
+            onClose={() => setShowToast(false)}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
+            {`"${rowCopied}" Copied!`}
+          </Alert>
+        </Snackbar>
 
-        <div style={{ display: 'flex', alignItems: "center", justifyContent: "space-between"}}>
+        <Header session={session} />
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <h1>Snippets</h1>
 
           <Autocomplete
-                freeSolo
-                id="free-solo-2-demo"
-                disableClearable
-                style={{ width: "200px" }}
-                options={userSnips.map((row) => row.name)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Search input"
-                    InputProps={{
-                      ...params.InputProps,
-                      type: "search",
-                    }}
-                    onChange={(e) => searchRows(e.target.value)}
-                  />
-                )}
+            freeSolo
+            id="free-solo-2-demo"
+            disableClearable
+            sx={{ width: "200px" }}
+            options={userSnips.map((row) => row.name)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search input"
+                InputProps={{
+                  ...params.InputProps,
+                  type: "search",
+                }}
+                onChange={(e) => searchRows(e.target.value)}
               />
+            )}
+          />
+        </Box>
 
-        </div>
-        
-
-        <div
-          style={{
+        <Box
+          sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -241,8 +290,7 @@ const Snippets = ({ session }) => {
         >
           {userSnips.length > 0 ? (
             <>
-              
-              <div style={{ display: "flex", width: "100%" }}>
+              {/* <Box sx={{ display: "flex", width: "100%" }}>
                 <button onClick={() => setDisplayedSnips(userSnips)}>
                   All
                 </button>
@@ -253,7 +301,19 @@ const Snippets = ({ session }) => {
                     {category}
                   </button>
                 ))}
-              </div>
+              </Box> */}
+              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <Tabs
+                  value={tabVal}
+                  onChange={(e, newVal) => setTabVal(newVal)}
+                  aria-label="lab API tabs example"
+                >
+                  <Tab label="All" value={0} />
+                  <Tab label="Item One" value={1} />
+                  <Tab label="Item Two" value={2} />
+                  <Tab label="Item Three" value={3} />
+                </Tabs>
+              </Box>
 
               <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 450 }} aria-label="simple table">
@@ -265,12 +325,19 @@ const Snippets = ({ session }) => {
                         key={row.id}
                         sx={{
                           "&:last-child td, &:last-child th": { border: 0 },
+                          cursor: "pointer",
                         }}
+                        onClick={() => handleRowClick(row)}
                       >
-                        <TableCell component="th" scope="row">
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ fontSize: 12 }}
+                        >
                           {row.edit ? (
                             <Input
                               placeholder={row.name}
+                              defaultValue={row.name}
                               onChange={(e) =>
                                 setUpdatedSnip({
                                   ...updatedSnip,
@@ -282,10 +349,11 @@ const Snippets = ({ session }) => {
                             row.name
                           )}
                         </TableCell>
-                        <TableCell align="right">
+                        <TableCell sx={{ fontSize: 12 }}>
                           {row.edit ? (
                             <Input
                               placeholder={row.snip_text}
+                              defaultValue={row.snip_text}
                               onChange={(e) =>
                                 setUpdatedSnip({
                                   ...updatedSnip,
@@ -297,10 +365,11 @@ const Snippets = ({ session }) => {
                             row.snip_text
                           )}
                         </TableCell>
-                        <TableCell align="right">
+                        <TableCell defaultValue={row.snip_text}>
                           {row.edit ? (
                             <Input
                               placeholder={row.category}
+                              defaultValue={row.category}
                               onChange={(e) =>
                                 setUpdatedSnip({
                                   ...updatedSnip,
@@ -318,14 +387,24 @@ const Snippets = ({ session }) => {
                             align="right"
                             onClick={() => deleteRow(row)}
                           >
-                            Delete
+                            <IconButton aria-label="copy" size="medium">
+                              <DeleteIcon
+                                sx={{ color: "red" }}
+                                fontSize="inherit"
+                              />
+                            </IconButton>
                           </TableCell>
                         ) : (
                           <TableCell
                             align="right"
                             onClick={() => copyText(row.snip_text)}
                           >
-                            Copy
+                            <IconButton aria-label="copy" size="medium">
+                              <ContentCopyIcon
+                                color="primary"
+                                fontSize="inherit"
+                              />
+                            </IconButton>
                           </TableCell>
                         )}
 
@@ -333,31 +412,48 @@ const Snippets = ({ session }) => {
                           align="right"
                           onClick={() => editSaveHandler(row)}
                         >
-                          {row.edit ? "Save" : "Edit"}
+                          {row.edit ? (
+                            <IconButton aria-label="copy" size="medium">
+                              <SaveIcon color="primary" fontSize="inherit" />
+                            </IconButton>
+                          ) : (
+                            <IconButton aria-label="copy" size="medium">
+                              <EditIcon color="primary" fontSize="inherit" />
+                            </IconButton>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-                <div
-                  style={{
+                <Divider />
+                <Box
+                  sx={{
                     width: "100%",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    padding: 5,
+                    paddingX: 5,
+                    paddingY: 4,
                   }}
                 >
-                  <button onClick={addRowHandler}>Add New Row</button>
-                </div>
+                  <Button
+                    onClick={addRowHandler}
+                    variant="contained"
+                    sx={{ width: "100%" }}
+                    color="primary"
+                  >
+                    Add New Row
+                  </Button>
+                </Box>
               </TableContainer>
             </>
           ) : (
             <CreateFirstSnip session={session} setUserSnips={setUserSnips} />
           )}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

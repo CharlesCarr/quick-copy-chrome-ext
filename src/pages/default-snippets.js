@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "../config/supabase-client";
 // MUI Components
 import {
@@ -10,44 +10,80 @@ import {
   TableRow,
   Paper,
   Input,
+  Button,
+  Typography,
+  Snackbar,
+  IconButton,
+  Divider,
+  Box
 } from "@mui/material";
 import Header from "../components/header";
 import TableHeader from "../components/table-header";
+import SignUpModal from "../components/sign-up-modal";
+import { useNavigate } from "react-router-dom";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MuiAlert from "@mui/material/Alert";
 
 const defaultSnips = [
   {
     id: 1,
-    name: "Example Email",
+    name: "Email",
     snip_text: "email@example.com",
     edit: false,
   },
   {
     id: 2,
-    name: "Example LinkedIn Profile URL",
+    name: "LinkedIn Profile URL",
     snip_text: "https://www.linkedin.com/in/exampleuser/",
     edit: false,
   },
   {
     id: 3,
-    name: "Example GitHub Profile URL",
+    name: "GitHub Profile URL",
     snip_text: "https://github.com/ExampleUser",
     edit: false,
   },
 ];
 
-const DefaultSnippets = () => {
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const DefaultSnippets = ({ session }) => {
   const [userSnips, setUserSnips] = useState(defaultSnips);
-  //   const [displayedSnips, setDisplayedSnips] = useState(true);
   const [updatedSnip, setUpdatedSnip] = useState(null);
-//   const { user } = session;
+  const [showSignUpModal, setShowSignUpModal] = useState(true);
+  const [activeUser, setActiveUser] = useState(null);
+  const navigate = useNavigate();
+  const [showToast, setShowToast] = useState(false);
+  const [rowCopied, setRowCopied] = useState(null);
+
+  useEffect(() => {
+    getUser();
+
+    if (activeUser) {
+      navigate("/snippets");
+    }
+  }, [activeUser]);
+
+  const getUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    setActiveUser(user);
+  };
 
   const copyText = async (text) => {
     console.log(text);
     try {
       await navigator.clipboard.writeText(text);
       // Alert the copied text
-      alert(`Copied Text! - ${text}`);
-      // displayToast(text);
+      // alert(`Copied Text! - ${text}`);
+      setRowCopied(text);
+      setShowToast(true);
     } catch (err) {
       console.error(`Failed to Copy - ${err}`);
       alert(`Failed to Copy - ${err}`);
@@ -55,6 +91,13 @@ const DefaultSnippets = () => {
   };
 
   const addRowHandler = () => {
+    if (userSnips.length === 6) {
+      // TO DO: Build modal for signing up
+      setShowSignUpModal(true);
+      // alert("Signup!!");
+      return;
+    }
+
     setUserSnips([
       ...userSnips,
       {
@@ -67,31 +110,41 @@ const DefaultSnippets = () => {
     ]);
   };
 
-  const editSaveHandler = (row) => {
-    console.log("edit / saving");
-    console.log("row", row);
+  const saveRow = (row) => {
+    console.log(row);
+    console.log(userSnips);
 
     if (row.edit) {
-      // conditional for whether saving for first time or updating
-      // 1234 is hardcoded in when creating new
+      // Saving for first time
       if (row.id === 1234) {
-        // TODO 1: save for first time
-        setUserSnips([
-          ...userSnips,
-          {
-            id: Math.random() * 10,
-            name: updatedSnip.name,
-            snip_text: updatedSnip.snip_text,
-            edit: false,
-          },
-        ]);
+        const updatedSnips = userSnips.map((snip) => {
+          if (snip.id === 1234) {
+            snip = {
+              id: Math.random() * 10,
+              name: updatedSnip.name,
+              snip_text: updatedSnip.snip_text,
+              edit: false,
+            };
+            return snip;
+          }
+          return snip;
+        });
+        console.log("updatedSnips", updatedSnips);
+        setUserSnips(updatedSnips);
       } else {
-        // think can prob use the id of the row to check whether it is a new row or we are updating existing
+        console.log("UPDATING");
+        console.log("row", row);
         // TODO 2: update existing record
         const updatedUserSnips = userSnips.map((snip) => {
           if (row.id === snip.id) {
-            snip.name = updatedSnip.name || row.name;
-            snip.snip_text = updatedSnip.snip_text || row.snip_text;
+            console.log(snip.name);
+            console.log(updatedSnip);
+            snip.name = updatedSnip ? updatedSnip.name : snip.name;
+            console.log(snip.name);
+            snip.snip_text = updatedSnip
+              ? updatedSnip.snip_text
+              : snip.snip_text;
+            snip.edit = false;
           }
           return snip;
         });
@@ -108,45 +161,67 @@ const DefaultSnippets = () => {
       });
       setUserSnips(newSnipArr);
     }
+
+    setUpdatedSnip(null);
   };
 
   const deleteRow = (row) => {
-    console.log(`deleting row ${row}`);
+    // flip the state to edit being true
+    const newSnipArr = userSnips.filter((snip) => {
+      return snip.id !== row.id;
+    });
+
+    setUserSnips(newSnipArr);
+  };
+
+  const handleRowClick = (row) => {
+    if (!row.edit) {
+      copyText(row.snip_text);
+    }
   };
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         width: "100vw",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
       }}
     >
-      <div style={{ width: "40%", border: "1px solid black", padding: "10px" }}>
-        <Header />
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
+      <Box sx={{ width: "50%", border: "1px solid #b2b2b2", padding: "20px" }}>
+        <Snackbar
+          open={showToast}
+          autoHideDuration={3000}
+          onClose={() => setShowToast(false)}
         >
-          <h1>Snippets</h1>
-        </div>
+          <Alert
+            onClose={() => setShowToast(false)}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
+            {`"${rowCopied}" Copied!`}
+          </Alert>
+        </Snackbar>
 
-        <div
-          style={{
+        <Header
+          session={session}
+          showSignUpModal={showSignUpModal}
+          setShowSignUpModal={setShowSignUpModal}
+        />
+
+        <Box
+          sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
+          {/* elevation={3} */}
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 450 }} aria-label="simple table">
-              <TableHeader />
+              <TableHeader type="default" />
 
               <TableBody>
                 {userSnips.map((row) => (
@@ -155,12 +230,15 @@ const DefaultSnippets = () => {
                     key={row.id}
                     sx={{
                       "&:last-child td, &:last-child th": { border: 0 },
+                      cursor: "pointer",
                     }}
+                    onClick={() => handleRowClick(row)}
                   >
-                    <TableCell component="th" scope="row">
+                    <TableCell component="th" scope="row" sx={{ fontSize: 12 }}>
                       {row.edit ? (
                         <Input
                           placeholder={row.name}
+                          defaultValue={row.name}
                           onChange={(e) =>
                             setUpdatedSnip({
                               ...updatedSnip,
@@ -172,10 +250,11 @@ const DefaultSnippets = () => {
                         row.name
                       )}
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell sx={{ fontSize: 12 }}>
                       {row.edit ? (
                         <Input
                           placeholder={row.snip_text}
+                          defaultValue={row.snip_text}
                           onChange={(e) =>
                             setUpdatedSnip({
                               ...updatedSnip,
@@ -187,60 +266,70 @@ const DefaultSnippets = () => {
                         row.snip_text
                       )}
                     </TableCell>
-                    <TableCell align="right">
-                      {row.edit ? (
-                        <Input
-                          placeholder={row.category}
-                          onChange={(e) =>
-                            setUpdatedSnip({
-                              ...updatedSnip,
-                              category: e.target.value,
-                            })
-                          }
-                        ></Input>
-                      ) : (
-                        row.category
-                      )}
-                    </TableCell>
 
                     {row.edit ? (
                       <TableCell align="right" onClick={() => deleteRow(row)}>
-                        Delete
+                        <IconButton aria-label="copy" size="medium">
+                          <DeleteIcon
+                            sx={{ color: "red" }}
+                            fontSize="inherit"
+                          />
+                        </IconButton>
                       </TableCell>
                     ) : (
                       <TableCell
                         align="right"
                         onClick={() => copyText(row.snip_text)}
                       >
-                        Copy
+                        <IconButton aria-label="copy" size="medium">
+                          <ContentCopyIcon
+                            // sx={{ cursor: "pointer" }}
+                            color="primary"
+                            fontSize="inherit"
+                          />
+                        </IconButton>
                       </TableCell>
                     )}
 
-                    <TableCell
-                      align="right"
-                      onClick={() => editSaveHandler(row)}
-                    >
-                      {row.edit ? "Save" : "Edit"}
+                    <TableCell align="right" onClick={() => saveRow(row)}>
+                      {row.edit ? (
+                        <IconButton aria-label="copy" size="medium">
+                          <SaveIcon color="primary" fontSize="inherit" />
+                        </IconButton>
+                      ) : (
+                        <IconButton aria-label="copy" size="medium">
+                          <EditIcon color="primary" fontSize="inherit" />
+                        </IconButton>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            <div
-              style={{
+            <Divider />
+            <Box
+              sx={{
                 width: "100%",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                padding: 5,
+                paddingX: 5,
+                paddingY: 4,
               }}
             >
-              <button onClick={addRowHandler}>Add New Row</button>
-            </div>
+              <Button
+                onClick={addRowHandler}
+                variant="contained"
+                sx={{ width: "100%" }}
+                color="primary"
+              >
+                Add New Row
+              </Button>
+            </Box>
           </TableContainer>
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
