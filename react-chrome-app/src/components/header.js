@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AppBar, Avatar, Box, Button, Toolbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { Typography, Paper } from "@mui/material";
+import { Typography } from "@mui/material";
 
 export default function Header({
   session,
@@ -25,6 +25,14 @@ export default function Header({
     }
   }, [session]);
 
+  const clickHandler = () => {
+    if (session) {
+      navigate("/snippets");
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -36,7 +44,7 @@ export default function Header({
         marginBottom: "20px",
       }}
     >
-      <AppBar position="static" sx={{ borderRadius: "10px"}}>
+      <AppBar position="static" sx={{ borderRadius: "10px" }}>
         <Toolbar>
           <Box
             sx={{
@@ -46,8 +54,12 @@ export default function Header({
               alignItems: "center",
             }}
           >
-            <ContentCopyIcon color="primary" />
-            <Typography sx={{ fontSize: 20 }}>
+            <ContentCopyIcon
+              color="primary"
+              sx={{ cursor: "pointer" }}
+              onClick={() => clickHandler()}
+            />
+            <Typography sx={{ fontSize: 20 }} onClick={() => clickHandler()}>
               Multi-Copy-Ext
             </Typography>
           </Box>
@@ -69,8 +81,8 @@ export default function Header({
               </>
             ) : (
               <Typography
-                onClick={() => navigate("/profile")}
-                sx={{ fontSize: 12 }}
+                onClick={() => navigate("/snippets")}
+                sx={{ fontSize: 12, cursor: "pointer" }}
               >
                 {userEmail}
               </Typography>
@@ -84,7 +96,7 @@ export default function Header({
               <Avatar
                 alt="User Avatar"
                 src={userAvatar}
-                sx={{ width: 40, height: 40 }}
+                sx={{ width: 40, height: 40, cursor: "pointer" }}
                 onClick={() => navigate("/profile")}
               />
             )}

@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import CreateFirstSnip from "../components/create-first-snip";
-import Snip from "../components/snip";
 import { supabase } from "../config/supabase-client";
 // MUI Components
 import {
@@ -23,15 +21,15 @@ import {
   Tab,
   Tabs,
 } from "@mui/material";
-import Header from "../components/header";
-import TableHeader from "../components/table-header";
-import { useNavigate } from "react-router-dom";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MuiAlert from "@mui/material/Alert";
 import { TableRowsSharp } from "@mui/icons-material";
+import Header from "../components/header";
+import CreateFirstSnip from "../components/create-first-snip";
+import TableHeader from "../components/table-header";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -50,7 +48,7 @@ const Snippets = ({ session }) => {
   const [showToast, setShowToast] = useState(false);
   const [rowCopied, setRowCopied] = useState(null);
   const { user } = session;
-  const [tabVal, setTabVal] = useState(1);
+  const [tabVal, setTabVal] = useState(0);
 
   // Need function for getting snips for the user
   useEffect(() => {
@@ -197,9 +195,13 @@ const Snippets = ({ session }) => {
   };
 
   const searchRows = (value) => {
+    console.log("search val", value);
+
     setSearching(true);
 
     const filteredRows = userSnips.filter((row) => {
+      console.log(row.name);
+
       return row.name.toUpperCase().includes(value.toUpperCase());
     });
 
@@ -234,7 +236,7 @@ const Snippets = ({ session }) => {
         alignItems: "center",
       }}
     >
-      <Box sx={{ width: "50%", border: "1px solid #b2b2b2", padding: "20px" }}>
+      <Box sx={{ width: "100%", padding: "20px" }}>
         <Snackbar
           open={showToast}
           autoHideDuration={3000}
@@ -258,18 +260,19 @@ const Snippets = ({ session }) => {
             justifyContent: "space-between",
           }}
         >
-          <h1>Snippets</h1>
+          <h1>Clipboard</h1>
 
           <Autocomplete
             freeSolo
             id="free-solo-2-demo"
             disableClearable
             sx={{ width: "200px" }}
+            // TO DO: fix bug with onClick handle for options
             options={userSnips.map((row) => row.name)}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Search input"
+                label="Search By Name"
                 InputProps={{
                   ...params.InputProps,
                   type: "search",
@@ -290,28 +293,33 @@ const Snippets = ({ session }) => {
         >
           {userSnips.length > 0 ? (
             <>
-              {/* <Box sx={{ display: "flex", width: "100%" }}>
-                <button onClick={() => setDisplayedSnips(userSnips)}>
-                  All
-                </button>
-                {categories.map((category) => (
-                  <button
-                    onClick={(e) => categoryClickHandler(e.target.innerHTML)}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </Box> */}
-              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Box
+                sx={{
+                  width: "100%",
+                  borderBottom: 1,
+                  borderColor: "divider",
+                }}
+              >
                 <Tabs
                   value={tabVal}
                   onChange={(e, newVal) => setTabVal(newVal)}
                   aria-label="lab API tabs example"
                 >
-                  <Tab label="All" value={0} />
-                  <Tab label="Item One" value={1} />
-                  <Tab label="Item Two" value={2} />
-                  <Tab label="Item Three" value={3} />
+                  <Tab
+                    label="All"
+                    value={0}
+                    onClick={() => setDisplayedSnips(userSnips)}
+                  />
+                  {categories.map((cat, ind) => {
+                    return (
+                      <Tab
+                        key={cat}
+                        label={cat}
+                        value={ind + 1}
+                        onClick={() => categoryClickHandler(cat)}
+                      />
+                    );
+                  })}
                 </Tabs>
               </Box>
 

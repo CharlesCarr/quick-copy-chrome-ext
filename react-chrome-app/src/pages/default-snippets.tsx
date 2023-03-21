@@ -6,26 +6,23 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
   Paper,
   Input,
   Button,
-  Typography,
   Snackbar,
   IconButton,
   Divider,
-  Box
+  Box,
 } from "@mui/material";
-import Header from "../components/header";
-import TableHeader from "../components/table-header";
-import SignUpModal from "../components/sign-up-modal";
 import { useNavigate } from "react-router-dom";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MuiAlert from "@mui/material/Alert";
+import TableHeader from "../components/table-header";
+import Header from "../components/header";
 
 const defaultSnips = [
   {
@@ -48,18 +45,22 @@ const defaultSnips = [
   },
 ];
 
-const Alert = React.forwardRef(function Alert(props, ref) {
+const Alert: any = React.forwardRef(function Alert(props, ref: any) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const DefaultSnippets = ({ session }) => {
-  const [userSnips, setUserSnips] = useState(defaultSnips);
-  const [updatedSnip, setUpdatedSnip] = useState(null);
-  const [showSignUpModal, setShowSignUpModal] = useState(true);
-  const [activeUser, setActiveUser] = useState(null);
+interface DefaultSnippetsProps {
+  session: any;
+}
+
+const DefaultSnippets = ({ session }: DefaultSnippetsProps) => {
+  const [userSnips, setUserSnips] = useState<any>(defaultSnips);
+  const [updatedSnip, setUpdatedSnip] = useState<any>(null);
+  const [showSignUpModal, setShowSignUpModal] = useState<any>(true);
+  const [activeUser, setActiveUser] = useState<any>(null);
   const navigate = useNavigate();
-  const [showToast, setShowToast] = useState(false);
-  const [rowCopied, setRowCopied] = useState(null);
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [rowCopied, setRowCopied] = useState<string | null>(null);
 
   useEffect(() => {
     getUser();
@@ -72,11 +73,11 @@ const DefaultSnippets = ({ session }) => {
   const getUser = async () => {
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    }: any = await supabase.auth.getUser();
     setActiveUser(user);
   };
 
-  const copyText = async (text) => {
+  const copyText = async (text: string) => {
     console.log(text);
     try {
       await navigator.clipboard.writeText(text);
@@ -110,19 +111,19 @@ const DefaultSnippets = ({ session }) => {
     ]);
   };
 
-  const saveRow = (row) => {
+  const saveRow = (row: any) => {
     console.log(row);
     console.log(userSnips);
 
     if (row.edit) {
       // Saving for first time
       if (row.id === 1234) {
-        const updatedSnips = userSnips.map((snip) => {
+        const updatedSnips = userSnips.map((snip: any) => {
           if (snip.id === 1234) {
             snip = {
               id: Math.random() * 10,
-              name: updatedSnip.name,
-              snip_text: updatedSnip.snip_text,
+              name: updatedSnip?.name,
+              snip_text: updatedSnip?.snip_text,
               edit: false,
             };
             return snip;
@@ -135,7 +136,7 @@ const DefaultSnippets = ({ session }) => {
         console.log("UPDATING");
         console.log("row", row);
         // TODO 2: update existing record
-        const updatedUserSnips = userSnips.map((snip) => {
+        const updatedUserSnips = userSnips.map((snip: any) => {
           if (row.id === snip.id) {
             console.log(snip.name);
             console.log(updatedSnip);
@@ -153,7 +154,7 @@ const DefaultSnippets = ({ session }) => {
       }
     } else {
       // flip the state to edit being true
-      const newSnipArr = userSnips.map((snip) => {
+      const newSnipArr = userSnips.map((snip: any) => {
         if (snip.id === row.id) {
           snip.edit = true;
         }
@@ -165,16 +166,16 @@ const DefaultSnippets = ({ session }) => {
     setUpdatedSnip(null);
   };
 
-  const deleteRow = (row) => {
+  const deleteRow = (row: any) => {
     // flip the state to edit being true
-    const newSnipArr = userSnips.filter((snip) => {
+    const newSnipArr = userSnips.filter((snip: any) => {
       return snip.id !== row.id;
     });
 
     setUserSnips(newSnipArr);
   };
 
-  const handleRowClick = (row) => {
+  const handleRowClick = (row: any) => {
     if (!row.edit) {
       copyText(row.snip_text);
     }
@@ -189,7 +190,7 @@ const DefaultSnippets = ({ session }) => {
         alignItems: "center",
       }}
     >
-      <Box sx={{ width: "50%", border: "1px solid #b2b2b2", padding: "20px" }}>
+      <Box sx={{ width: "100%", padding: "20px" }}>
         <Snackbar
           open={showToast}
           autoHideDuration={3000}
@@ -224,7 +225,7 @@ const DefaultSnippets = ({ session }) => {
               <TableHeader type="default" />
 
               <TableBody>
-                {userSnips.map((row) => (
+                {userSnips.map((row: any) => (
                   <TableRow
                     hover
                     key={row.id}

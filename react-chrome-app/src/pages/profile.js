@@ -1,10 +1,10 @@
-import { Avatar } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Avatar, Box, Button, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import { supabase } from "../config/supabase-client";
 
-const Profile = () => {
+const Profile = ({ session }) => {
   const [activeUser, setActiveUser] = useState(null);
   const [profileData, setProfileData] = useState(null);
   console.log(activeUser);
@@ -112,30 +112,20 @@ const Profile = () => {
   if (!profileData) return <p>No profile data yet..</p>;
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         width: "100vw",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
       }}
     >
-      <div style={{ width: "50%", border: "1px solid black", padding: "10px" }}>
-        <Header
-        // session={session}
-        // showSignUpModal={showSignUpModal}
-        // setShowSignUpModal={setShowSignUpModal}
-        />
+      <Box sx={{ width: "100%", padding: "10px" }}>
+        <Header session={session} />
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <h1>User Profile</h1>
-        </div>
+        <Typography variant="h4" align="center">
+          User Profile
+        </Typography>
 
         <form
           onSubmit={handleSubmit}
@@ -150,41 +140,47 @@ const Profile = () => {
             padding: "20px",
           }}
         >
-          {/* <div style={{ display: "flex", alignItems: "center", gap: "5px" }}> */}
           <Avatar
             alt="User Avatar"
             src={profileData.avatar_url}
             sx={{ width: 100, height: 100 }}
           />
-          <p>{activeUser.email}</p>
-          {/* </div> */}
+          <Typography>{activeUser.email}</Typography>
 
-          <label htmlFor="full_name">Full Name</label>
-          <input
-            type="text"
-            name="full_name"
+          <TextField
+            id="full_name"
+            label="Full Name"
+            variant="filled"
             defaultValue={profileData.full_name}
             onChange={(e) => setFullName(e.target.value)}
-          ></input>
+          />
 
-          <label html="username">Username</label>
-          <input
-            type="text"
-            name="username"
+          <TextField
+            id="username"
+            label="Username"
+            variant="filled"
             defaultValue={profileData.username}
             onChange={(e) => setUsername(e.target.value)}
-          ></input>
+          />
 
-          <button type="submit" style={{ marginTop: "20px" }}>
-            Update
-          </button>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "20px",
+            }}
+          >
+            <Button onClick={handleDelete} variant="outlined" color="error">
+              Delete
+            </Button>
+            <Button type="submit" variant="contained">
+              Update
+            </Button>
+          </Box>
         </form>
-
-        <button style={{ marginTop: "40px" }} onClick={handleDelete}>
-          Delete Account
-        </button>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

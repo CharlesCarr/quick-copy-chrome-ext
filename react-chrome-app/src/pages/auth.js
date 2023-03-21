@@ -3,7 +3,7 @@ import {
   signInWithGoogle,
   signInWithPassword,
   signUp,
-} from "../utils/supabase-utils";
+} from "../../../../react-chrome-app/src/utils/supabase-utils";
 import { useNavigate } from "react-router-dom";
 
 const Auth = () => {

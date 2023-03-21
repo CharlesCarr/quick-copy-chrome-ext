@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { supabase } from "../config/supabase-client";
+import { supabase } from "../../../react-chrome-app-ts/my-app/src/config/supabase-client";
 
 const Snip = ({ data }) => {
   console.log(data);

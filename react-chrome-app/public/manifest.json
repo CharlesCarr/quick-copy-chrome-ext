@@ -1,0 +1,10 @@
+{
+  "name": "Multi-Copy-Ext",
+  "description": "A simple clipboard UI chrome extension",
+  "author": "charlie-carr.com",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "index.html"
+  }
+}
