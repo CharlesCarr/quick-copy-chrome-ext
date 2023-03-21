@@ -5,7 +5,12 @@ import App from "./App";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
-const darkTheme = createTheme({
+const font = "'Raleway', sans-serif";
+
+const theme = createTheme({
+  typography: {
+    fontFamily: font,
+  },
   palette: {
     mode: "dark",
   },
@@ -16,7 +21,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <App />
     </ThemeProvider>
