@@ -30,18 +30,21 @@ const defaultSnips = [
     name: "Email",
     snip_text: "email@example.com",
     edit: false,
+    error: false,
   },
   {
     id: 2,
     name: "LinkedIn Profile URL",
     snip_text: "https://www.linkedin.com/in/exampleuser/",
     edit: false,
+    error: false,
   },
   {
     id: 3,
     name: "GitHub Profile URL",
     snip_text: "https://github.com/ExampleUser",
     edit: false,
+    error: false,
   },
 ];
 
@@ -53,14 +56,23 @@ interface DefaultSnippetsProps {
   session: any;
 }
 
+interface RowInputs {
+  name: string;
+  snip_text: string;
+}
+
 const DefaultSnippets = ({ session }: DefaultSnippetsProps) => {
   const [userSnips, setUserSnips] = useState<any>(defaultSnips);
-  const [updatedSnip, setUpdatedSnip] = useState<any>(null);
+  const [updatedSnip, setUpdatedSnip] = useState<RowInputs>({
+    name: "",
+    snip_text: "",
+  });
   const [showSignUpModal, setShowSignUpModal] = useState<any>(true);
   const [activeUser, setActiveUser] = useState<any>(null);
   const navigate = useNavigate();
   const [showToast, setShowToast] = useState<boolean>(false);
   const [rowCopied, setRowCopied] = useState<string | null>(null);
+  const [inputError, setInputError] = useState(false);
 
   useEffect(() => {
     getUser();
@@ -115,7 +127,31 @@ const DefaultSnippets = ({ session }: DefaultSnippetsProps) => {
     console.log(row);
     console.log(userSnips);
 
+    console.log("***updatedSnip", updatedSnip);
+
     if (row.edit) {
+      // Check for blank inputs
+      if (!updatedSnip.name || !updatedSnip.snip_text) {
+        console.log("Invalid Inputs");
+        // alert("Invalid Row!!");
+        // setInputError(true);
+        const snipsContainErr = userSnips.map((snip: any) => {
+          if (snip.id === row.id) {
+            snip = {
+              id: snip.id,
+              name: snip.name,
+              snip_text: snip.snip_text,
+              edit: true,
+              error: true,
+            };
+          }
+          return snip;
+        });
+        setUserSnips(snipsContainErr);
+
+        return;
+      }
+
       // Saving for first time
       if (row.id === 1234) {
         const updatedSnips = userSnips.map((snip: any) => {
@@ -125,6 +161,7 @@ const DefaultSnippets = ({ session }: DefaultSnippetsProps) => {
               name: updatedSnip?.name,
               snip_text: updatedSnip?.snip_text,
               edit: false,
+              error: false,
             };
             return snip;
           }
@@ -146,6 +183,7 @@ const DefaultSnippets = ({ session }: DefaultSnippetsProps) => {
               ? updatedSnip.snip_text
               : snip.snip_text;
             snip.edit = false;
+            snip.error = false;
           }
           return snip;
         });
@@ -163,7 +201,10 @@ const DefaultSnippets = ({ session }: DefaultSnippetsProps) => {
       setUserSnips(newSnipArr);
     }
 
-    setUpdatedSnip(null);
+    // setUpdatedSnip({
+    //   name: "",
+    //   snip_text: "",
+    // });
   };
 
   const deleteRow = (row: any) => {
@@ -227,12 +268,14 @@ const DefaultSnippets = ({ session }: DefaultSnippetsProps) => {
               <TableBody>
                 {userSnips.map((row: any) => (
                   <TableRow
-                    hover
+                    hover={!row.error && true}
                     key={row.id}
                     sx={{
                       "&:last-child td, &:last-child th": { border: 0 },
                       cursor: "pointer",
+                      backgroundColor: row.error && "#ff726f",
                     }}
+                    // {`${row.error} && background: "red"`}
                     onClick={() => handleRowClick(row)}
                   >
                     <TableCell component="th" scope="row" sx={{ fontSize: 12 }}>
@@ -240,6 +283,7 @@ const DefaultSnippets = ({ session }: DefaultSnippetsProps) => {
                         <Input
                           placeholder={row.name}
                           defaultValue={row.name}
+                          color="error"
                           onChange={(e) =>
                             setUpdatedSnip({
                               ...updatedSnip,

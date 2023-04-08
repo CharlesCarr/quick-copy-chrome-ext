@@ -6,11 +6,17 @@ import { useNavigate } from "react-router-dom";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { Typography } from "@mui/material";
 
+interface HeaderProps {
+  session: any,
+  showSignUpModal?: any,
+  setShowSignUpModal?: any
+}
+
 export default function Header({
   session,
   showSignUpModal,
   setShowSignUpModal,
-}) {
+}: HeaderProps) {
   const [userAvatar, setUserAvatar] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
   const navigate = useNavigate();

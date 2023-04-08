@@ -34,7 +34,11 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "env": {
+      "webextensions": true,
+      "browser": true
+    }
   },
   "browserslist": {
     "production": [
@@ -49,6 +53,7 @@
     ]
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.224",
     "ts-loader": "^9.4.2",
     "webpack": "^5.76.2",
     "webpack-cli": "^5.0.1"

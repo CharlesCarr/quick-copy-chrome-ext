@@ -4,11 +4,16 @@ import { supabase } from "./config/supabase-client";
 import DefaultSnippets from "./pages/default-snippets";
 import Profile from "./pages/profile";
 import Snippets from "./pages/snippets";
+import { extensionGoogleLogin } from "./utils/supabase-utils";
 
 function App() {
   const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
+    // testing
+    extensionGoogleLogin();
+
+    // believe this needs to be tweaked as well
     supabase.auth.getSession().then(({ data: { session } }) => {
       // TODO: think need to add check here and navigate (?)
       setSession(session);
@@ -18,8 +23,6 @@ function App() {
       setSession(session);
     });
   }, []);
-
-  console.log("Session", session);
 
   return (
     <Router>
